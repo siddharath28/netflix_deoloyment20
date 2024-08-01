@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Netflix Recommender System">
+    <meta name="author" content="Dr Briit">
+
+    <title>Netflix Recommender System</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&family=Noto+Sans+JP&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body id="content">
+
+    <div class="results">
+        <center>
+            <h2 id="name" class="text-uppercase">{{title}}</h2>
+        </center>
+    </div>
+    <br>
+
+    <div id="mycontent">
+        <div id="mcontent" class="d-flex flex-wrap">
+            <div class="poster-lg mx-auto">
+                <img class="poster rounded" height="400" width="250" src="{{poster}}" alt="{{title}} poster">
+            </div>
+            <div class="poster-sm text-center mx-auto">
+                <img class="poster rounded mb-3" height="400" width="250" src="{{poster}}" alt="{{title}} poster">
+            </div>
+            <div id="details" class="text-white ml-3">
+                <h6 id="title">Main Title: &nbsp;{{title}}</h6>
+                <h6 id="overview" style="max-width: 85%;">Overview: <br/><br/>{{overview}}</h6>
+                <h6 id="vote_average">Rating: &nbsp;{{vote_average}}/10 ({{vote_count}} votes)</h6>
+                <h6 id="genres">Genre: &nbsp;{{genres}}</h6>
+                <h6 id="date">Release Date: &nbsp;{{release_date}}</h6>
+                <h6 id="runtime">Runtime: &nbsp;{{runtime}}</h6>
+                <h6 id="status">Status: &nbsp;{{status}}</h6>
+            </div>
+        </div>
+    </div>
+    <br/>
+
+    {% for name, details in cast_details.items() %}
+        <div class="modal fade" id="{{details[0]}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel3" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #e50914; color: white;">
+                        <h5 class="modal-title" id="exampleModalLabel3">{{name}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" style="color: white;">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body d-flex">
+                        <img class="profile-pic rounded" src="{{details[1]}}" alt="{{name}} profile" style="width: 250px; height: 400px;" />
+                        <div class="ml-3">
+                            <p><strong>Birthday:</strong> {{details[2]}}</p>
+                            <p><strong>Place of Birth:</strong> {{details[3]}}</p>
+                            <p><strong>Biography:</strong><br>{{details[4]}}</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if casts|length > 1 %}
+        <div class="movie text-white">
+            <center>
+                <h3>Actors & Actresses</h3>
+                <h5>(Click on the cast to know more)</h5>
+            </center>
+        </div>
+
+        <div class="movie-content d-flex flex-wrap justify-content-center">
+            {% for name, details in casts.items() %}
+                <div class="castcard card m-2" style="width: 15rem;" title="Click to know more about {{name}}" data-toggle="modal" data-target="#{{details[0]}}">
+                    <div class="imghvr">
+                        <img class="card-img-top cast-img" id="{{details[0]}}" height="360" width="240" alt="{{name}} profile" src="{{details[2]}}">
+                        <figcaption class="fig">
+                            <button class="card-btn btn btn-danger">Know More</button>
+                        </figcaption>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{name|title}}</h5>
+                        <h5 class="card-title text-muted">Character: {{details[1]|title}}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <center>
+        {% if reviews %}
+            <h2 class="text-white">User Reviews</h2>
+            <div class="col-md-12" style="margin-top: 25px;">
+                <table class="table table-bordered text-white">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 75%;">Reviews</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review, status in reviews.items() %}
+                            <tr style="background-color: #e5091485;">
+                                <td>{{review}}</td>
+                                <td class="text-center">
+                                    {{status}}:
+                                    {% if status == 'Good' %}
+                                        &#128515;
+                                    {% else %}
+                                        &#128534;
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-white">
+                <h1>This movie is not released yet. Stay tuned!</h1>
+            </div>
+        {% endif %}
+    </center>
+
+    {% if movie_cards|length > 1 %}
+        <div class="movie text-white">
+            <center>
+                <h3>Recommended Movies for You</h3>
+                <h5>(Click any of the movies to get a recommendation)</h5>
+            </center>
+        </div>
+
+        <div class="movie-content d-flex flex-wrap justify-content-center">
+            {% for poster, title in movie_cards.items() %}
+                <div class="card m-2" style="width: 15rem;" title="{{title}}" onclick="recommendcard(this)">
+                    <div class="imghvr">
+                        <img class="card-img-top" height="360" width="240" alt="{{title}} poster" src="{{poster}}">
+                        <figcaption class="fig">
+                            <button class="card-btn btn btn-danger">View</button>
+                        </figcaption>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{title|capitalize}}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='recommend.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
